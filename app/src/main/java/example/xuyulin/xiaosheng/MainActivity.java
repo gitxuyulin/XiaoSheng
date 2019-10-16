@@ -40,7 +40,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.sample_call:
 //                NativeCallPresent.callJavaStaticMethod();
 //                NativeCallPresent.callJavaCommonMethod();
-                setAccessObject();
+//                setAccessObject();
+                setSuperInstace();
                 break;
         }
     }
@@ -56,6 +57,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        accessInstaceField(userBean);
         accessStaticField(userBean);
         Log.e("xyl", "数据" + userBean.getSex());
+    }
+
+    /**
+     * natice创建super的实例
+     */
+    public void setSuperInstace() {
+        callSuperInstaceMethod();
     }
 
     /**
@@ -76,5 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public native static void accessInstaceField(UserBean userBean);
 
-    public native static void accessStaticField(UserBean userBean);
+    public native void accessStaticField(UserBean userBean);
+
+    public native static void callSuperInstaceMethod();
 }

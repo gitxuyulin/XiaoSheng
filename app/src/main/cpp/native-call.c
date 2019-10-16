@@ -90,7 +90,6 @@ void Java_example_xuyulin_xiaosheng_NativeCallPresent_callJavaStaticMethod(JNIEn
 }
 
 void Java_example_xuyulin_xiaosheng_MainActivity_accessInstaceField(JNIEnv *env, jclass cls,
-
                                                                     jobject user_bean) {
     jclass clazz;
     jfieldID fid;
@@ -123,7 +122,7 @@ void Java_example_xuyulin_xiaosheng_MainActivity_accessInstaceField(JNIEnv *env,
     (*env)->DeleteLocalRef(env, j_newStr);
 }
 
-void Java_example_xuyulin_xiaosheng_MainActivity_accessStaticField(JNIEnv *env, jclass cls,
+void Java_example_xuyulin_xiaosheng_MainActivity_accessStaticField(JNIEnv *env, jobject thiz,
                                                                    jobject user_bean) {
 
     jclass clazz;
@@ -152,4 +151,50 @@ void Java_example_xuyulin_xiaosheng_MainActivity_accessStaticField(JNIEnv *env, 
 
     (*env)->DeleteLocalRef(env, j_sex);
     (*env)->DeleteLocalRef(env, j_newSex);
+}
+
+void Java_example_xuyulin_xiaosheng_MainActivity_callSuperInstaceMethod(JNIEnv *env, jclass cls) {
+
+    jclass cls_son;
+    jclass cls_father;
+    jmethodID method_son_init;
+    jmethodID method_father_run;
+    jmethodID method_father_getname;
+    jstring c_str_name;
+    jobject obj_son;
+    const char *name = NULL;
+
+    // 1、获取Cat类的class引用
+    cls_son = (*env)->FindClass(env, "example.xuyulin.xiaosheng.Son");
+    if (cls_son == NULL)return;
+
+    // 2、获取Cat的构造方法ID(构造方法的名统一为：<init>)
+    method_son_init = (*env)->GetMethodID(env, cls_son, "<init>", "(Ljava/lang/String;)V");
+    if (method_son_init == NULL)return;
+
+    c_str_name = (*env)->NewStringUTF(env, "我是汤姆");
+    if (c_str_name == NULL)return;
+
+    obj_son = (*env)->NewObject(env, cls_son, method_son_init, c_str_name);
+    if (obj_son == NULL)return;
+
+    //-----------调用父类的方法------------
+    cls_father = (*env)->FindClass(env, "example.xuyulin.xiaosheng.Father");
+    if (cls_father == NULL)return;
+    method_father_run = (*env)->GetMethodID(env, cls_father, "run", "()V");
+    if (method_father_run == NULL)return;
+    (*env)->CallNonvirtualVoidMethod(env, obj_son, cls_father, method_father_run);
+    method_father_getname = (*env)->GetMethodID(env, cls_father, "getName", "()Ljava/lang/String");
+    if (method_father_getname == NULL)return;
+    c_str_name = (*env)->CallNonvirtualObjectMethod(env, obj_son, cls_father,
+                                                    method_father_getname);
+    name = (*env)->GetStringUTFChars(env, c_str_name, NULL);
+    __android_log_print(ANDROID_LOG_ERROR, "xyl", "名字是：%s", name);
+
+    (*env)->ReleaseStringUTFChars(env, c_str_name, name);
+
+    (*env)->DeleteLocalRef(env, cls_son);
+    (*env)->DeleteLocalRef(env, cls_father);
+    (*env)->DeleteLocalRef(env, c_str_name);
+    (*env)->DeleteLocalRef(env, obj_son);
 }
