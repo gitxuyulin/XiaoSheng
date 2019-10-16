@@ -181,11 +181,14 @@ void Java_example_xuyulin_xiaosheng_MainActivity_callSuperInstaceMethod(JNIEnv *
     //-----------调用父类的方法------------
     cls_father = (*env)->FindClass(env, "example.xuyulin.xiaosheng.Father");
     if (cls_father == NULL)return;
+
     method_father_run = (*env)->GetMethodID(env, cls_father, "run", "()V");
     if (method_father_run == NULL)return;
+
     (*env)->CallNonvirtualVoidMethod(env, obj_son, cls_father, method_father_run);
     method_father_getname = (*env)->GetMethodID(env, cls_father, "getName", "()Ljava/lang/String");
     if (method_father_getname == NULL)return;
+
     c_str_name = (*env)->CallNonvirtualObjectMethod(env, obj_son, cls_father,
                                                     method_father_getname);
     name = (*env)->GetStringUTFChars(env, c_str_name, NULL);
