@@ -158,17 +158,17 @@ void Java_example_xuyulin_xiaosheng_MainActivity_callSuperInstaceMethod(JNIEnv *
     jclass cls_son;
     jclass cls_father;
     jmethodID method_son_init;
-    jmethodID method_father_run;
+    jmethodID method_father_start;
     jmethodID method_father_getname;
     jstring c_str_name;
     jobject obj_son;
     const char *name = NULL;
 
-    // 1、获取Cat类的class引用
-    cls_son = (*env)->FindClass(env, "example.xuyulin.xiaosheng.Son");
+    // 1、获取son类的class引用
+    cls_son = (*env)->FindClass(env, "example/xuyulin/xiaosheng/Son");
     if (cls_son == NULL)return;
 
-    // 2、获取Cat的构造方法ID(构造方法的名统一为：<init>)
+    // 2、获取son的构造方法ID(构造方法的名统一为：<init>)
     method_son_init = (*env)->GetMethodID(env, cls_son, "<init>", "(Ljava/lang/String;)V");
     if (method_son_init == NULL)return;
 
@@ -176,17 +176,19 @@ void Java_example_xuyulin_xiaosheng_MainActivity_callSuperInstaceMethod(JNIEnv *
     if (c_str_name == NULL)return;
 
     obj_son = (*env)->NewObject(env, cls_son, method_son_init, c_str_name);
-    if (obj_son == NULL)return;
+    if (obj_son == NULL) {
+        goto quit;
+    }
 
     //-----------调用父类的方法------------
-    cls_father = (*env)->FindClass(env, "example.xuyulin.xiaosheng.Father");
+    cls_father = (*env)->FindClass(env, "example/xuyulin/xiaosheng/Father");
     if (cls_father == NULL)return;
 
-    method_father_run = (*env)->GetMethodID(env, cls_father, "run", "()V");
-    if (method_father_run == NULL)return;
+    method_father_start = (*env)->GetMethodID(env, cls_father, "start", "()V");
+    if (method_father_start == NULL)return;
 
-    (*env)->CallNonvirtualVoidMethod(env, obj_son, cls_father, method_father_run);
-    method_father_getname = (*env)->GetMethodID(env, cls_father, "getName", "()Ljava/lang/String");
+    (*env)->CallNonvirtualVoidMethod(env, obj_son, cls_father, method_father_start);
+    method_father_getname = (*env)->GetMethodID(env, cls_father, "getName", "()Ljava/lang/String;");
     if (method_father_getname == NULL)return;
 
     c_str_name = (*env)->CallNonvirtualObjectMethod(env, obj_son, cls_father,
@@ -196,6 +198,7 @@ void Java_example_xuyulin_xiaosheng_MainActivity_callSuperInstaceMethod(JNIEnv *
 
     (*env)->ReleaseStringUTFChars(env, c_str_name, name);
 
+    quit:
     (*env)->DeleteLocalRef(env, cls_son);
     (*env)->DeleteLocalRef(env, cls_father);
     (*env)->DeleteLocalRef(env, c_str_name);
