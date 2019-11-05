@@ -4,11 +4,17 @@
 
 #include <jni.h>
 #include <android/log.h>
+#include <string.h>
+#include <stdio.h>
 
 jobjectArray getStrings(JNIEnv *env, jobject obj, jint count, jstring sample) {
 
     const char *c_str_sample = NULL;
     jclass cls_string = NULL;
+    jmethodID mid_string_init = NULL;
+    jobject obj_str = NULL;
+    jobjectArray str_array = NULL;
+    char buff[256];
 
     //保证至少可以创建3个局部引用（str_array,cls_string,obj_str）
     if ((*env)->EnsureLocalCapacity(env, 3) != JNI_OK) {
@@ -24,6 +30,45 @@ jobjectArray getStrings(JNIEnv *env, jobject obj, jint count, jstring sample) {
     if (cls_string == NULL) {
         return NULL;
     }
+
+    //获取string的构造方法
+    mid_string_init = (*env)->GetMethodID(env, cls_string, "<init>", "()V");
+    if (mid_string_init == NULL) {
+        (*env)->DeleteLocalRef(env, cls_string);
+        return NULL;
+    }
+
+    obj_str = (*env)->NewObject(env, cls_string, mid_string_init);
+    if (obj_str == NULL) {
+        (*env)->DeleteLocalRef(env, cls_string);
+        return NULL;
+    }
+
+    //创建一个字符串数组
+    str_array = (*env)->NewObjectArray(env, count, cls_string, obj_str);
+    if (str_array == NULL) {
+        (*env)->DeleteLocalRef(env, cls_string);
+        (*env)->DeleteLocalRef(env, obj_str);
+        return NULL;
+    }
+
+    //给数组中每个元素赋值
+    for (int i = 0; i < count; ++i) {
+        memset(buff, 0, sizeof(buff));
+        sprintf(buff, c_str_sample, i);
+        __android_log_print(ANDROID_LOG_ERROR, "xyl", "字符串=%s", buff);
+        jstring newStr = (*env)->NewStringUTF(env, buff);
+        (*env)->SetObjectArrayElement(env, str_array, i, newStr);
+    }
+
+    //释放模版字符串所占内存
+    (*env)->ReleaseStringUTFChars(env, sample, c_str_sample);
+
+    //释放局部内存
+    (*env)->DeleteLocalRef(env, cls_string);
+    (*env)->DeleteLocalRef(env, obj_str);
+
+    return str_array;
 }
 
 static jclass g_cls_OOMActivity = NULL;
