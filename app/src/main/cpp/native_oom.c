@@ -59,6 +59,8 @@ jobjectArray getStrings(JNIEnv *env, jobject obj, jint count, jstring sample) {
         __android_log_print(ANDROID_LOG_ERROR, "xyl", "字符串=%s", buff);
         jstring newStr = (*env)->NewStringUTF(env, buff);
         (*env)->SetObjectArrayElement(env, str_array, i, newStr);
+        //这里会溢出，报ANR，可以这样修改避免
+        (*env)->DeleteLocalRef(env, newStr);
     }
 
     //释放模版字符串所占内存

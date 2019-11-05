@@ -3,9 +3,12 @@ package example.xuyulin.cash;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.google.gson.Gson;
 
 import example.xuyulin.xiaosheng.R;
 
@@ -36,6 +39,7 @@ public class OOMActivity extends AppCompatActivity implements View.OnClickListen
     public void onClick(View v) {
         if (v.getId() == R.id.oom_button) {
             String[] strings = getStrings(Integer.parseInt(mOOMEdittext.getText().toString()), "I Love You %d Year");
+            Log.e("xyl", "native结果：" + new Gson().toJson(strings));
         }
     }
 
