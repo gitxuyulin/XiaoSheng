@@ -21,7 +21,8 @@ add_library( # Sets the name of the library.
         name.cpp
         native-call.c
         cash-normal.c
-        native_oom.c)
+        native_oom.c
+        native_throw.c)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
